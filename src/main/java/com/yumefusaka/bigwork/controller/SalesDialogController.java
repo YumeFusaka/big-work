@@ -68,6 +68,53 @@ public class SalesDialogController {
         quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
             updateTotalPrice();
         });
+
+        // 设置借阅项目的显示格式
+        itemComboBox.setButtonCell(new ListCell<Publication>() {
+            @Override
+            protected void updateItem(Publication item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle());
+                }
+            }
+        });
+        
+        itemComboBox.setCellFactory(param -> new ListCell<Publication>() {
+            @Override
+            protected void updateItem(Publication item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle());
+                }
+            }
+        });
+
+        // 设置数量输入限制
+        quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.matches("\\d*")) {
+                quantityField.setText(newVal.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        // 设置价格和总价格式化
+        priceField.setTextFormatter(new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("\\d*\\.?\\d{0,2}")) {
+                return change;
+            }
+            return null;
+        }));
+
+        totalPriceField.setTextFormatter(new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("\\d*\\.?\\d{0,2}")) {
+                return change;
+            }
+            return null;
+        }));
     }
 
     private void loadCustomers() {
@@ -95,7 +142,19 @@ public class SalesDialogController {
             if (itemComboBox.getValue() != null && !quantityField.getText().isEmpty()) {
                 double price = Double.parseDouble(priceField.getText());
                 int quantity = Integer.parseInt(quantityField.getText());
+                
+                // 检查数量是否超过库存
+                Publication selectedItem = itemComboBox.getValue();
+                if (quantity > selectedItem.getAvailableQuantity()) {
+                    quantityField.setStyle("-fx-text-fill: red;");
+                } else {
+                    quantityField.setStyle("");
+                }
+                
+                // 计算并显示总价
                 totalPriceField.setText(String.format("%.2f", price * quantity));
+            } else {
+                totalPriceField.setText("");
             }
         } catch (NumberFormatException e) {
             totalPriceField.setText("");
@@ -114,20 +173,46 @@ public class SalesDialogController {
     private void handleSave() {
         if (isInputValid()) {
             try {
+                // 获取选中的商品和数量
+                Publication selectedItem = itemComboBox.getValue();
+                int quantity = Integer.parseInt(quantityField.getText());
+                
+                // 检查库存
+                if (quantity > selectedItem.getAvailableQuantity()) {
+                    showError("库存不足", String.format("当前库存：%d，无法销售%d个",
+                        selectedItem.getAvailableQuantity(), quantity));
+                    return;
+                }
+                
+                // 创建销售记录
                 Sale sale = new Sale();
                 sale.setCustomerId(customerComboBox.getValue().getId());
                 sale.setItemType("图书".equals(itemTypeComboBox.getValue()) ? "BOOK" : "MAGAZINE");
-                sale.setItemId(((Publication)itemComboBox.getValue()).getId());
-                sale.setQuantity(Integer.parseInt(quantityField.getText()));
+                sale.setItemId(selectedItem.getId());
+                sale.setQuantity(quantity);
                 sale.setTotalPrice(Double.parseDouble(totalPriceField.getText()));
                 sale.setSaleDate(saleDatePicker.getValue());
                 
+                // 更新库存
+                selectedItem.setTotalQuantity(selectedItem.getTotalQuantity() - quantity);
+                selectedItem.setAvailableQuantity(selectedItem.getAvailableQuantity() - quantity);
+                
+                // 保存销售记录和更新库存
+                if ("图书".equals(itemTypeComboBox.getValue())) {
+                    bookDAO.update((Book)selectedItem);
+                } else {
+                    magazineDAO.update((Magazine)selectedItem);
+                }
                 saleDAO.insert(sale);
                 
                 saveClicked = true;
                 dialogStage.close();
             } catch (SQLException e) {
                 showError("保存失败", e.getMessage());
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                showError("输入错误", "请输入有效的数字");
+                e.printStackTrace();
             }
         }
     }
@@ -145,11 +230,11 @@ public class SalesDialogController {
         }
 
         if (itemTypeComboBox.getValue() == null) {
-            errorMessage.append("请选择类型！\n");
+            errorMessage.append("请选择商品类型！\n");
         }
 
         if (itemComboBox.getValue() == null) {
-            errorMessage.append("请选择图书/期刊！\n");
+            errorMessage.append("请选择商品！\n");
         }
 
         try {
@@ -158,12 +243,13 @@ public class SalesDialogController {
                 errorMessage.append("数量必须大于0！\n");
             }
             
-            Publication selectedItem = (Publication)itemComboBox.getValue();
+            Publication selectedItem = itemComboBox.getValue();
             if (selectedItem != null && quantity > selectedItem.getAvailableQuantity()) {
-                errorMessage.append("库存不足！\n");
+                errorMessage.append(String.format("库存不足！当前库存：%d\n", 
+                    selectedItem.getAvailableQuantity()));
             }
         } catch (NumberFormatException e) {
-            errorMessage.append("数量必须是整数！\n");
+            errorMessage.append("请输入有效的数量！\n");
         }
 
         if (saleDatePicker.getValue() == null) {
@@ -180,6 +266,15 @@ public class SalesDialogController {
 
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    // 添加一个方法来显示成功消息
+    private void showSuccess(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

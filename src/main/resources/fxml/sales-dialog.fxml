@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.yumefusaka.bigwork.controller.SalesDialogController"
+            prefWidth="400" prefHeight="400">
+    
+    <GridPane hgap="10" vgap="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" 
+              AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="50">
+        <padding>
+            <Insets top="5" right="5" bottom="5" left="5"/>
+        </padding>
+
+        <!-- 客户选择 -->
+        <Label text="客户：" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <ComboBox fx:id="customerComboBox" prefWidth="250" 
+                  GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <!-- 商品类型 -->
+        <Label text="商品类型：" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="itemTypeComboBox" prefWidth="250"
+                  GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <!-- 具体商品 -->
+        <Label text="商品：" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="itemComboBox" prefWidth="250"
+                  GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <!-- 单价 -->
+        <Label text="单价：" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <TextField fx:id="priceField" prefWidth="250" editable="false"
+                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+        <!-- 数量 -->
+        <Label text="数量：" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <TextField fx:id="quantityField" prefWidth="250"
+                   GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+        <!-- 总价 -->
+        <Label text="总价：" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+        <TextField fx:id="totalPriceField" prefWidth="250" editable="false"
+                   GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+        <!-- 销售日期 -->
+        <Label text="销售日期：" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+        <DatePicker fx:id="saleDatePicker" prefWidth="250"
+                    GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+    </GridPane>
+
+    <!-- 按钮区域 -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" 
+          AnchorPane.bottomAnchor="10" AnchorPane.rightAnchor="10">
+        <Button text="保存" onAction="#handleSave" defaultButton="true"/>
+        <Button text="取消" onAction="#handleCancel" cancelButton="true"/>
+    </HBox>
+
+</AnchorPane> 

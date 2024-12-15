@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SalesController {
     @FXML
@@ -115,31 +117,86 @@ public class SalesController {
 
     @FXML
     private void handleSearch() {
-        // TODO: 实现搜索功能
+        String searchType = searchTypeComboBox.getValue();
+        String keyword = searchField.getText().trim();
+        
+        try {
+            List<Sale> searchResults;
+            
+            if (keyword.isEmpty()) {
+                // 如果搜索关键词为空，显示所有记录
+                searchResults = saleDAO.findAll();
+            } else {
+                searchResults = saleList.stream()
+                    .filter(sale -> {
+                        switch (searchType) {
+                            case "客户姓名":
+                                return sale.getCustomerName().toLowerCase()
+                                    .contains(keyword.toLowerCase());
+                            case "图书/期刊名":
+                                return sale.getItemTitle().toLowerCase()
+                                    .contains(keyword.toLowerCase());
+                            default: // "全部"
+                                return sale.getCustomerName().toLowerCase()
+                                        .contains(keyword.toLowerCase()) ||
+                                    sale.getItemTitle().toLowerCase()
+                                        .contains(keyword.toLowerCase());
+                        }
+                    })
+                    .collect(Collectors.toList());
+            }
+            
+            saleList.clear();
+            saleList.addAll(searchResults);
+        } catch (SQLException e) {
+            showError("搜索失败", e.getMessage());
+        }
     }
 
     @FXML
     private void handleAdd() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/sales-dialog.fxml"));
+            // 加载销售对话框FXML
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/sales-dialog.fxml"));
+            if (loader.getLocation() == null) {
+                throw new IllegalStateException("无法找到FXML文件: /fxml/sales-dialog.fxml");
+            }
+            
             Scene scene = new Scene(loader.load());
             
+            // 创建对话框窗口
             Stage dialogStage = new Stage();
             dialogStage.setTitle("新增销售");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(salesTable.getScene().getWindow());
             dialogStage.setScene(scene);
+            dialogStage.setResizable(false); // 禁止调整窗口大小
             
+            // 获取对话框控制器
             SalesDialogController controller = loader.getController();
+            if (controller == null) {
+                throw new IllegalStateException("无法获取对话框控制器");
+            }
             controller.setDialogStage(dialogStage);
             
+            // 显示对话框并等待用户响应
             dialogStage.showAndWait();
             
+            // 如果用户点击了保存按钮，刷新销售列表
             if (controller.isSaveClicked()) {
                 loadSales();
+                
+                // 显示成功消息
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("成功");
+                alert.setHeaderText(null);
+                alert.setContentText("销售记录已成功添加！");
+                alert.showAndWait();
             }
         } catch (Exception e) {
-            showError("打开销售对话框失败", e.getMessage());
+            showError("打开销售对话框失败", "错误详情: " + e.getMessage());
+            e.printStackTrace(); // 在控制台打印详细错误信息
         }
     }
 
