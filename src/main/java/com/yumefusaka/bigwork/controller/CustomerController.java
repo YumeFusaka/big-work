@@ -5,9 +5,15 @@ import com.yumefusaka.bigwork.model.Customer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -77,7 +83,17 @@ public class CustomerController {
 
     @FXML
     private void handleAdd() {
-        // TODO: 实现添加功能
+        Customer newCustomer = new Customer();
+        boolean okClicked = showEditDialog(newCustomer, "新增客户");
+        
+        if (okClicked) {
+            try {
+                customerDAO.insert(newCustomer);
+                customerList.add(newCustomer);
+            } catch (SQLException e) {
+                showError("保存失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -87,7 +103,17 @@ public class CustomerController {
             showError("错误", "请选择要编辑的客户");
             return;
         }
-        // TODO: 实现编辑功能
+
+        boolean okClicked = showEditDialog(selectedCustomer, "编辑客户");
+        
+        if (okClicked) {
+            try {
+                customerDAO.update(selectedCustomer);
+                customerTable.refresh();
+            } catch (SQLException e) {
+                showError("保存失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -127,5 +153,32 @@ public class CustomerController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         return alert.showAndWait();
+    }
+
+    private boolean showEditDialog(Customer customer, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/customer-edit-dialog.fxml"));
+            Parent page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(title);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(customerTable.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            CustomerEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setCustomer(customer);
+
+            dialogStage.showAndWait();
+            return controller.isOkClicked();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("对话框错误", "无法打开编辑对话框");
+            return false;
+        }
     }
 } 
