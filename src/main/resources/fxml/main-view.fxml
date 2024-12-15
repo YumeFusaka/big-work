@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.yumefusaka.bigwork.controller.MainController"
+      prefHeight="600.0" prefWidth="800.0">
+
+    <MenuBar>
+        <Menu text="文件">
+            <MenuItem text="退出" onAction="#handleExit"/>
+        </Menu>
+        <Menu text="基础数据">
+            <MenuItem text="图书类别管理" onAction="#handleBookCategory"/>
+            <MenuItem text="期刊类别管理" onAction="#handleMagazineCategory"/>
+            <MenuItem text="出版社管理" onAction="#handlePublisher"/>
+        </Menu>
+        <Menu text="信息管理">
+            <MenuItem text="图书信息" onAction="#handleBook"/>
+            <MenuItem text="期刊信息" onAction="#handleMagazine"/>
+            <MenuItem text="客户信息" onAction="#handleCustomer"/>
+        </Menu>
+        <Menu text="业务管理">
+            <MenuItem text="借阅管理" onAction="#handleBorrowing"/>
+            <MenuItem text="销售管理" onAction="#handleSales"/>
+        </Menu>
+        <Menu text="统计分析">
+            <MenuItem text="借阅统计" onAction="#handleBorrowingStats"/>
+            <MenuItem text="销售统计" onAction="#handleSalesStats"/>
+        </Menu>
+    </MenuBar>
+
+    <TabPane fx:id="mainTabPane" VBox.vgrow="ALWAYS">
+        <!-- 标签页将在运行时动态添加 -->
+    </TabPane>
+
+</VBox> 

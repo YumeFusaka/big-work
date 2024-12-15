@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.yumefusaka.bigwork.controller.MagazineController"
+      spacing="10" style="-fx-padding: 10 10 10 10;">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="搜索期刊..." prefWidth="200"/>
+        <Button text="搜索" onAction="#handleSearch"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="新增" onAction="#handleAdd"/>
+        <Button text="编辑" onAction="#handleEdit"/>
+        <Button text="删除" onAction="#handleDelete"/>
+    </HBox>
+
+    <TableView fx:id="magazineTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID"/>
+            <TableColumn fx:id="titleColumn" text="期刊名"/>
+            <TableColumn fx:id="issueColumn" text="期号"/>
+            <TableColumn fx:id="publisherColumn" text="出版社"/>
+            <TableColumn fx:id="categoryColumn" text="类别"/>
+            <TableColumn fx:id="totalQuantityColumn" text="总数量"/>
+            <TableColumn fx:id="availableQuantityColumn" text="可用数量"/>
+            <TableColumn fx:id="priceColumn" text="价格"/>
+        </columns>
+    </TableView>
+</VBox> 

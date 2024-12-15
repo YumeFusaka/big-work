@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.yumefusaka.bigwork.controller.BorrowingController"
+      spacing="10" style="-fx-padding: 10 10 10 10;">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <ComboBox fx:id="searchTypeComboBox" prefWidth="100"/>
+        <TextField fx:id="searchField" promptText="搜索借阅记录..." prefWidth="200"/>
+        <Button text="搜索" onAction="#handleSearch"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="借出" onAction="#handleBorrow"/>
+        <Button text="归还" onAction="#handleReturn"/>
+    </HBox>
+
+    <TableView fx:id="borrowingTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID"/>
+            <TableColumn fx:id="customerNameColumn" text="客户"/>
+            <TableColumn fx:id="itemTypeColumn" text="类型"/>
+            <TableColumn fx:id="itemTitleColumn" text="借阅项目"/>
+            <TableColumn fx:id="borrowDateColumn" text="借出日期"/>
+            <TableColumn fx:id="returnDateColumn" text="归还日期"/>
+            <TableColumn fx:id="statusColumn" text="状态"/>
+        </columns>
+    </TableView>
+</VBox> 

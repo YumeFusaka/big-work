@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.yumefusaka.bigwork.controller.SalesController"
+      spacing="10" style="-fx-padding: 10 10 10 10;">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <ComboBox fx:id="searchTypeComboBox" prefWidth="100"/>
+        <TextField fx:id="searchField" promptText="搜索销售记录..." prefWidth="200"/>
+        <Button text="搜索" onAction="#handleSearch"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="新增销售" onAction="#handleAdd"/>
+    </HBox>
+
+    <TableView fx:id="salesTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID"/>
+            <TableColumn fx:id="customerNameColumn" text="客户"/>
+            <TableColumn fx:id="itemTypeColumn" text="类型"/>
+            <TableColumn fx:id="itemTitleColumn" text="商品名称"/>
+            <TableColumn fx:id="quantityColumn" text="数量"/>
+            <TableColumn fx:id="totalPriceColumn" text="总价"/>
+            <TableColumn fx:id="saleDateColumn" text="日期"/>
+        </columns>
+    </TableView>
+</VBox> 

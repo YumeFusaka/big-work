@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.yumefusaka.bigwork.controller.SalesStatsController"
+      spacing="10" style="-fx-padding: 10 10 10 10;">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <DatePicker fx:id="startDate" promptText="开始日期"/>
+        <DatePicker fx:id="endDate" promptText="结束日期"/>
+        <Button text="查询" onAction="#handleQuery"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="导出报表" onAction="#handleExport"/>
+    </HBox>
+
+    <TabPane>
+        <Tab text="销售趋势">
+            <LineChart fx:id="trendChart">
+                <xAxis>
+                    <CategoryAxis label="日期"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="销售额"/>
+                </yAxis>
+            </LineChart>
+        </Tab>
+        <Tab text="商品类别统计">
+            <PieChart fx:id="categoryChart"/>
+        </Tab>
+    </TabPane>
+
+    <TableView fx:id="statsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="categoryColumn" text="类别"/>
+            <TableColumn fx:id="totalSalesColumn" text="销售总额"/>
+            <TableColumn fx:id="quantityColumn" text="销售数量"/>
+            <TableColumn fx:id="averagePriceColumn" text="平均单价"/>
+        </columns>
+    </TableView>
+</VBox> 

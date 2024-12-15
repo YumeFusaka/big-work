@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.yumefusaka.bigwork.controller.BorrowingStatsController"
+      spacing="10" style="-fx-padding: 10 10 10 10;">
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <DatePicker fx:id="startDate" promptText="开始日期"/>
+        <DatePicker fx:id="endDate" promptText="结束日期"/>
+        <Button text="查询" onAction="#handleQuery"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="导出报表" onAction="#handleExport"/>
+    </HBox>
+
+    <TabPane>
+        <Tab text="借阅趋势" closable="false">
+            <LineChart fx:id="trendChart">
+                <xAxis>
+                    <CategoryAxis label="日期"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="借阅数量"/>
+                </yAxis>
+            </LineChart>
+        </Tab>
+        <Tab text="类别统计" closable="false">
+            <PieChart fx:id="categoryChart"/>
+        </Tab>
+    </TabPane>
+
+    <TableView fx:id="statsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="categoryColumn" text="类别"/>
+            <TableColumn fx:id="totalBorrowingsColumn" text="借阅总数"/>
+            <TableColumn fx:id="activeColumn" text="当前借出"/>
+            <TableColumn fx:id="overdueColumn" text="逾期数量"/>
+        </columns>
+    </TableView>
+</VBox> 
