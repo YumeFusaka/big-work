@@ -9,9 +9,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -93,7 +95,20 @@ public class BookController {
 
     @FXML
     private void handleAdd() {
-        // TODO: 实现添加图书对话框
+        Book newBook = new Book();
+        // 设置默认值
+        newBook.setTotalQuantity(0);
+        newBook.setAvailableQuantity(0);
+        newBook.setPrice(0.0);
+        
+        if (showEditDialog(newBook, "新增图书")) {
+            try {
+                bookDAO.insert(newBook);
+                bookList.add(newBook);
+            } catch (SQLException e) {
+                showError("添加失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -103,7 +118,15 @@ public class BookController {
             showError("错误", "请选择要编辑的图书");
             return;
         }
-        // TODO: 实现编辑图书对话框
+
+        if (showEditDialog(selectedBook, "编辑图书")) {
+            try {
+                bookDAO.update(selectedBook);
+                bookTable.refresh();
+            } catch (SQLException e) {
+                showError("更新失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -143,5 +166,32 @@ public class BookController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         return alert.showAndWait();
+    }
+
+    private boolean showEditDialog(Book book, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/book-edit-dialog.fxml"));
+            GridPane page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(title);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(bookTable.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            BookEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setBook(book);
+
+            dialogStage.showAndWait();
+
+            return controller.isOkClicked();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("对话框错误", "无法打开编辑对话框");
+            return false;
+        }
     }
 } 
