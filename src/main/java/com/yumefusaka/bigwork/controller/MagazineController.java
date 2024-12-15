@@ -5,9 +5,15 @@ import com.yumefusaka.bigwork.model.Magazine;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -89,12 +95,38 @@ public class MagazineController {
 
     @FXML
     private void handleAdd() {
-        // TODO: 实现添加功能
+        Magazine newMagazine = new Magazine();
+        // 设置默认值
+        newMagazine.setTotalQuantity(0);
+        newMagazine.setAvailableQuantity(0);
+        newMagazine.setPrice(0.0);
+        
+        if (showEditDialog(newMagazine, "新增期刊")) {
+            try {
+                magazineDAO.insert(newMagazine);
+                magazineList.add(newMagazine);
+            } catch (SQLException e) {
+                showError("添加失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
     private void handleEdit() {
-        // TODO: 实现编辑功能
+        Magazine selectedMagazine = magazineTable.getSelectionModel().getSelectedItem();
+        if (selectedMagazine == null) {
+            showError("错误", "请选择要编辑的期刊");
+            return;
+        }
+
+        if (showEditDialog(selectedMagazine, "编辑期刊")) {
+            try {
+                magazineDAO.update(selectedMagazine);
+                magazineTable.refresh();
+            } catch (SQLException e) {
+                showError("更新失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -118,6 +150,33 @@ public class MagazineController {
             } catch (SQLException e) {
                 showError("删除失败", e.getMessage());
             }
+        }
+    }
+
+    private boolean showEditDialog(Magazine magazine, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/magazine-edit-dialog.fxml"));
+            GridPane page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(title);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(magazineTable.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            MagazineEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setMagazine(magazine);
+
+            dialogStage.showAndWait();
+
+            return controller.isOkClicked();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("对话框错误", "无法打开编辑对话框");
+            return false;
         }
     }
 

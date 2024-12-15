@@ -20,7 +20,6 @@
         <columns>
             <TableColumn fx:id="idColumn" text="ID"/>
             <TableColumn fx:id="titleColumn" text="期刊名"/>
-            <TableColumn fx:id="issueColumn" text="期号"/>
             <TableColumn fx:id="publisherColumn" text="出版社"/>
             <TableColumn fx:id="categoryColumn" text="类别"/>
             <TableColumn fx:id="totalQuantityColumn" text="总数量"/>
