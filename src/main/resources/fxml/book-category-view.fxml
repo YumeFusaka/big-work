@@ -20,7 +20,6 @@
         <columns>
             <TableColumn fx:id="idColumn" text="ID"/>
             <TableColumn fx:id="nameColumn" text="类别名称"/>
-            <TableColumn fx:id="descriptionColumn" text="描述"/>
         </columns>
     </TableView>
 </VBox> 

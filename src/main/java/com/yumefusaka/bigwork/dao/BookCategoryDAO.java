@@ -13,6 +13,7 @@ public class BookCategoryDAO {
     private static final String INSERT = "INSERT INTO BookCategory (name) VALUES (?)";
     private static final String UPDATE = "UPDATE BookCategory SET name = ? WHERE category_id = ?";
     private static final String DELETE = "DELETE FROM BookCategory WHERE category_id = ?";
+    private static final String SEARCH = "SELECT * FROM BookCategory WHERE name LIKE ?";
 
     public List<BookCategory> findAll() throws SQLException {
         List<BookCategory> categories = new ArrayList<>();
@@ -81,5 +82,25 @@ public class BookCategoryDAO {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         }
+    }
+
+    public List<BookCategory> search(String keyword) throws SQLException {
+        List<BookCategory> categories = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(SEARCH)) {
+            
+            String searchPattern = "%" + keyword + "%";
+            pstmt.setString(1, searchPattern);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    BookCategory category = new BookCategory();
+                    category.setId(rs.getInt("category_id"));
+                    category.setName(rs.getString("name"));
+                    categories.add(category);
+                }
+            }
+        }
+        return categories;
     }
 } 
