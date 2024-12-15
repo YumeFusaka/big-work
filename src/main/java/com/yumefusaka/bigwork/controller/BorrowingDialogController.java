@@ -44,6 +44,31 @@ public class BorrowingDialogController {
         // 设置默认日期为今天
         borrowDatePicker.setValue(LocalDate.now());
         
+        // 设置借阅项目的显示格式
+        itemComboBox.setButtonCell(new ListCell<Publication>() {
+            @Override
+            protected void updateItem(Publication item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle());
+                }
+            }
+        });
+        
+        itemComboBox.setCellFactory(param -> new ListCell<Publication>() {
+            @Override
+            protected void updateItem(Publication item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle());
+                }
+            }
+        });
+        
         // 加载客户数据
         loadCustomers();
     }
