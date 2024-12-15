@@ -5,9 +5,15 @@ import com.yumefusaka.bigwork.model.MagazineCategory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -23,9 +29,6 @@ public class MagazineCategoryController {
     
     @FXML
     private TableColumn<MagazineCategory, String> nameColumn;
-    
-    @FXML
-    private TableColumn<MagazineCategory, String> descriptionColumn;
 
     private MagazineCategoryDAO categoryDAO;
     private ObservableList<MagazineCategory> categoryList;
@@ -38,7 +41,6 @@ public class MagazineCategoryController {
         // 初始化表格列
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         // 设置表格数据
         categoryTable.setItems(categoryList);
@@ -73,7 +75,17 @@ public class MagazineCategoryController {
 
     @FXML
     private void handleAdd() {
-        // TODO: 实现添加功能
+        MagazineCategory newCategory = new MagazineCategory();
+        boolean okClicked = showEditDialog(newCategory, "新增类别");
+        
+        if (okClicked) {
+            try {
+                categoryDAO.insert(newCategory);
+                categoryList.add(newCategory);
+            } catch (SQLException e) {
+                showError("添加失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -83,7 +95,17 @@ public class MagazineCategoryController {
             showError("错误", "请选择要编辑的类别");
             return;
         }
-        // TODO: 实现编辑功能
+        
+        boolean okClicked = showEditDialog(selectedCategory, "编辑类别");
+        
+        if (okClicked) {
+            try {
+                categoryDAO.update(selectedCategory);
+                categoryTable.refresh();
+            } catch (SQLException e) {
+                showError("更新失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -123,5 +145,32 @@ public class MagazineCategoryController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         return alert.showAndWait();
+    }
+
+    private boolean showEditDialog(MagazineCategory category, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/magazine-category-edit-dialog.fxml"));
+            Parent page = loader.load();
+            
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(title);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(categoryTable.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+            
+            MagazineCategoryEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setCategory(category);
+            
+            dialogStage.showAndWait();
+            return controller.isOkClicked();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("对话框错误", "无法打开编辑对话框");
+            return false;
+        }
     }
 } 
