@@ -8,7 +8,7 @@ public class DatabaseConnection {
     private static DatabaseConnection instance;
     private Connection connection;
     
-    private static final String URL = "jdbc:mysql://localhost:3306/bigwork?useSSL=false&serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://localhost:3306/bigwork?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String USER = "yumefusaka";
     private static final String PASSWORD = "j";
     
