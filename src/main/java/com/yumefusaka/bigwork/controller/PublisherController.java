@@ -7,9 +7,15 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
 
 import java.sql.SQLException;
 import java.util.Optional;
+import java.io.IOException;
 
 public class PublisherController {
     @FXML
@@ -77,7 +83,15 @@ public class PublisherController {
 
     @FXML
     private void handleAdd() {
-        // TODO: 实现添加功能
+        Publisher newPublisher = new Publisher();
+        if (showEditDialog(newPublisher, "新增出版社")) {
+            try {
+                publisherDAO.insert(newPublisher);
+                publisherList.add(newPublisher);
+            } catch (SQLException e) {
+                showError("添加失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -87,7 +101,15 @@ public class PublisherController {
             showError("错误", "请选择要编辑的出版社");
             return;
         }
-        // TODO: 实现编辑功能
+
+        if (showEditDialog(selectedPublisher, "编辑出版社")) {
+            try {
+                publisherDAO.update(selectedPublisher);
+                publisherTable.refresh();
+            } catch (SQLException e) {
+                showError("更新失败", e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -127,5 +149,32 @@ public class PublisherController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         return alert.showAndWait();
+    }
+
+    private boolean showEditDialog(Publisher publisher, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/publisher-edit-dialog.fxml"));
+            GridPane page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(title);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(publisherTable.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            PublisherEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setPublisher(publisher);
+
+            dialogStage.showAndWait();
+
+            return controller.isOkClicked();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("对话框错误", "无法打开编辑对话框");
+            return false;
+        }
     }
 } 

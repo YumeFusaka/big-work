@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.yumefusaka.bigwork.controller.PublisherEditDialogController"
+          hgap="10" vgap="10">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="出版社名称:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+    <Label text="地址:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <TextField fx:id="addressField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+    <Label text="联系方式:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <TextField fx:id="contactField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3">
+        <Button text="确定" onAction="#handleOk"/>
+        <Button text="取消" onAction="#handleCancel"/>
+    </HBox>
+</GridPane>
